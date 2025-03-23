@@ -1,0 +1,40 @@
+using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Attributes.Registration;
+using CounterStrikeSharp.API.Modules.Commands;
+
+namespace PanoramaVoteManager
+{
+    public partial class PanoramaVoteManager
+    {
+        [ConsoleCommand("t", "test")]
+        [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY, minArgs: 0, usage: "!t")]
+        public void CommandTest(CCSPlayerController player, CommandInfo command)
+        {
+            if (!player.UserId.HasValue) return;
+            // notify user if vote a vote is already in queue
+            if (_currentVote != null || _votes.Count > 0)
+            {
+                // calculate approximate time of all votes in queue
+                long time = _votes.Sum(v => v.Time + Config.Cooldown) + (_currentVote?.Time + (_currentVote?.Time > 0 ? Config.Cooldown : 0) ?? 0);
+                command.ReplyToCommand(Localizer["vote.cooldown"].Value
+                    .Replace("{time}", time.ToString()));
+            }
+            Random random = new Random();
+            // Generates a random number between 3 and 12 inclusive
+            int randomTime = random.Next(3, 13);
+            // randomize vote initiator
+            int voteId = random.NextDouble() < 0.5 ? 99 : player.UserId.Value;
+            // add vote
+            _votes.Add(new Vote(
+                "#SFUI_vote_passed_nextlevel_extend", // fix: distribute language file to allow custom strings
+                $"This is my cool vote -> {randomTime}",
+                randomTime,
+                -1,
+                [],
+                voteId
+            ));
+            // start vote
+            StartVote();
+        }
+    }
+}
