@@ -17,6 +17,9 @@
             <ExcludeAssets>runtime</ExcludeAssets>
             <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
        </PackageReference>
+       <ProjectReference Include="..\PanoramaVoteManagerAPI\PanoramaVoteManagerAPI.csproj">
+      <Private>false</Private>
+    </ProjectReference>
     </ItemGroup>
 
     <ItemGroup>

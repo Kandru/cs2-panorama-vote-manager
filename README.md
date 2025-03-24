@@ -1,6 +1,5 @@
 # CounterstrikeSharp - Panorama Vote Manager
 
-[![UpdateManager Compatible](https://img.shields.io/badge/CS2-UpdateManager-darkgreen)](https://github.com/Kandru/cs2-update-manager/)
 [![GitHub release](https://img.shields.io/github/release/Kandru/cs2-panorama-vote-manager?include_prereleases=&sort=semver&color=blue)](https://github.com/Kandru/cs2-panorama-vote-manager/releases/)
 [![License](https://img.shields.io/badge/License-GPLv3-blue)](#license)
 [![issues - cs2-map-modifier](https://img.shields.io/github/issues/Kandru/cs2-panorama-vote-manager)](https://github.com/Kandru/cs2-panorama-vote-manager/issues)
@@ -11,10 +10,10 @@ The Panorama Vote Manager allows plugins to interact with the CS2 Panorama Vote 
 ## Installation
 
 1. Download and extract the latest release from the [GitHub releases page](https://github.com/Kandru/cs2-panorama-vote-manager/releases/).
+2. Stop the server.
 2. Move the "PanoramaVoteManager" folder to the `/addons/counterstrikesharp/configs/plugins/` directory.
+2. Move the "PanoramaVoteManagerAPI" folder to the `/addons/counterstrikesharp/configs/shared/` directory.
 3. Restart the server.
-
-Updating is even easier: simply overwrite all plugin files and they will be reloaded automatically. To automate updates please use our [CS2 Update Manager](https://github.com/Kandru/cs2-update-manager/).
 
 ## Using custom vote text
 

@@ -1,7 +1,11 @@
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Capabilities;
 using CounterStrikeSharp.API.Modules.UserMessages;
 using CounterStrikeSharp.API.Modules.Utils;
+using PanoramaVoteManagerAPI;
+using PanoramaVoteManagerAPI.Enums;
+using PanoramaVoteManagerAPI.Vote;
 
 namespace PanoramaVoteManager
 {
@@ -17,7 +21,13 @@ namespace PanoramaVoteManager
 
         public override void Load(bool hotReload)
         {
+            API = this;
+            // register plugin capability
+            if (!hotReload)
+                Capabilities.RegisterPluginCapability(IPanoramaVoteManagerAPI.Capability, () => API);
+            // do not load if plugin is disabled
             if (!Config.Enabled) return;
+            // register event handlers
             RegisterEventHandler<EventVoteCast>(OnVoteCast);
             RegisterListener<Listeners.OnMapEnd>(OnMapEnd);
         }
@@ -91,15 +101,27 @@ namespace PanoramaVoteManager
             });
         }
 
-        private void EndVote()
+        private void EndVote(bool canceled = false)
         {
             if (_currentVote == null || _voteController == null) return;
             DebugPrint("EndVote");
             VoteStates result = _currentVote.OnVoteEnd();
-            if (result == VoteStates.SUCCESS)
+            if (!canceled && result == VoteStates.SUCCESS)
+            {
+                // send user message to players
                 SendMessageVoteEnd(_currentVote, true);
+                // send vote result to external plugin
+                if (_currentVote.Callback != null)
+                    _currentVote.Callback(_currentVote, true);
+            }
             else
+            {
+                // send user message to players
                 SendMessageVoteEnd(_currentVote, false);
+                // send vote result to external plugin
+                if (_currentVote.Callback != null)
+                    _currentVote.Callback(_currentVote, false);
+            }
             // reset vote controller
             ResetVoteController();
             // reset current vote

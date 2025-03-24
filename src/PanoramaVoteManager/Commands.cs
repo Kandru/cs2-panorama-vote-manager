@@ -1,6 +1,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Commands;
+using PanoramaVoteManagerAPI.Vote;
 
 namespace PanoramaVoteManager
 {
@@ -15,7 +16,7 @@ namespace PanoramaVoteManager
             if (_currentVote != null || _votes.Count > 0 || _timeUntilNextVote > DateTimeOffset.UtcNow.ToUnixTimeSeconds())
             {
                 // calculate approximate time of all votes in queue
-                long time = _votes.Sum(v => v.Time + Config.Cooldown) + (_currentVote?.Time + Config.Cooldown ?? Config.Cooldown);
+                int time = _votes.Sum(v => v.Time + Config.Cooldown) + (_currentVote?.Time + Config.Cooldown ?? Config.Cooldown);
                 command.ReplyToCommand(Localizer["vote.cooldown"].Value
                     .Replace("{time}", time.ToString()));
             }
