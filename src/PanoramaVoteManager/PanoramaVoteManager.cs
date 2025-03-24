@@ -1,6 +1,8 @@
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Capabilities;
+using CounterStrikeSharp.API.Core.Translations;
+using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.UserMessages;
 using CounterStrikeSharp.API.Modules.Utils;
 using PanoramaVoteManagerAPI;
@@ -14,6 +16,7 @@ namespace PanoramaVoteManager
         public override string ModuleName => "CS2 PanoramaVoteManager";
         public override string ModuleAuthor => "Kalle <kalle@kandru.de>";
 
+        private readonly PlayerLanguageManager playerLanguageManager = new();
         private CVoteController? _voteController => Utilities.FindAllEntitiesByDesignerName<CVoteController>("vote_controller").LastOrDefault();
         private List<Vote> _votes = [];
         private Vote? _currentVote = null;
@@ -160,14 +163,6 @@ namespace PanoramaVoteManager
         {
             if (vote == null) return;
             DebugPrint("SendMessageVoteStart");
-            // set recipients which should get the message (if applicable)
-            RecipientFilter recipientFilter = [];
-            foreach (var playerID in vote.PlayerIDs)
-            {
-                CCSPlayerController? player = Utilities.GetPlayerFromUserid(playerID);
-                if (player == null || !player.IsValid) continue;
-                recipientFilter.Add(player);
-            }
             // get player slot of userid for initiator
             if (vote.Initiator != 99)
             {
@@ -175,15 +170,25 @@ namespace PanoramaVoteManager
                 if (player != null && player.IsValid)
                     vote.Initiator = player.Slot;
             }
-            UserMessage userMessage = UserMessage.FromPartialName("VoteStart");
-            userMessage.SetInt("team", vote.Team);
-            userMessage.SetInt("player_slot", vote.Initiator);
-            userMessage.SetInt("vote_type", (int)VoteTypes.UNKNOWN);
-            userMessage.SetString("disp_str", vote.Title);
-            userMessage.SetString("details_str", vote.Text);
-            userMessage.SetString("other_team_str", "#SFUI_otherteam_vote_unimplemented");
-            userMessage.SetBool("is_yes_no_vote", true);
-            userMessage.Send(recipientFilter);
+            // send message to each recipient to allow individual translation
+            foreach (var playerID in vote.PlayerIDs)
+            {
+                CCSPlayerController? player = Utilities.GetPlayerFromUserid(playerID);
+                if (player == null || !player.IsValid) continue;
+                // get translation for player (if available), otherwise use server language, otherwise use first entry
+                string text = vote.Text.TryGetValue(playerLanguageManager.GetLanguage(new SteamID(player.NetworkIDString)).TwoLetterISOLanguageName, out string? playerLanguage) ? playerLanguage
+                    : vote.Text.TryGetValue(CoreConfig.ServerLanguage, out string? serverLanguage) ? serverLanguage
+                    : vote.Text.First().Value ?? string.Empty;
+                UserMessage userMessage = UserMessage.FromPartialName("VoteStart");
+                userMessage.SetInt("team", vote.Team);
+                userMessage.SetInt("player_slot", vote.Initiator);
+                userMessage.SetInt("vote_type", (int)VoteTypes.UNKNOWN);
+                userMessage.SetString("disp_str", vote.SFUI);
+                userMessage.SetString("details_str", text);
+                userMessage.SetString("other_team_str", "#SFUI_otherteam_vote_unimplemented");
+                userMessage.SetBool("is_yes_no_vote", true);
+                userMessage.Send([player]);
+            }
         }
 
         private void SendMessageVoteEnd(Vote vote, bool success)

@@ -28,7 +28,10 @@ namespace PanoramaVoteManager
             // add vote
             _votes.Add(new Vote(
                 "#SFUI_vote_custom_default",
-                $"This is my cool vote -> {randomTime}",
+                new Dictionary<string, string> {
+                    {"en", $"This is my cool vote -> {randomTime}"},
+                    {"de", $"Mein toller Vote -> {randomTime}"},
+                },
                 randomTime,
                 -1,
                 [],

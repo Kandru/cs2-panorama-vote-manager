@@ -5,8 +5,8 @@ namespace PanoramaVoteManagerAPI.Vote;
 
 public class Vote
 {
-    public string Title { get; set; }
-    public string Text { get; set; }
+    public string SFUI { get; set; }
+    public Dictionary<string, string> Text { get; set; }
     public int Time { get; set; }
     public int Team { get; set; }
     public List<int> PlayerIDs { get; set; }
@@ -16,9 +16,9 @@ public class Vote
     public Dictionary<int, int> _voters { get; set; } = new Dictionary<int, int>();
     public Action<Vote, bool>? Callback { get; set; } = null;
 
-    public Vote(string title, string text, int time, int team, List<int> playerIDs, int initiator = 99, Action<Vote, bool>? callback = null)
+    public Vote(string sfui, Dictionary<string, string> text, int time, int team, List<int> playerIDs, int initiator = 99, Action<Vote, bool>? callback = null)
     {
-        Title = title;
+        SFUI = sfui;
         Text = text;
         Time = time;
         Team = team;

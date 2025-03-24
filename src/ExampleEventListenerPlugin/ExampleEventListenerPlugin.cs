@@ -46,7 +46,10 @@ namespace ExampleEventListenerPlugin
             int voteId = random.NextDouble() < 0.5 ? 99 : player.UserId.Value;
             Vote vote = new Vote(
                 "#SFUI_vote_custom_default",
-                $"This is vote triggered by another plugin for {randomTime} seconds :)",
+                new Dictionary<string, string> {
+                    {"en", $"This is vote triggered by another plugin for {randomTime} seconds :)"},
+                    {"de", $"Das ist ein Vote aus einem anderen Plugin für {randomTime} Sekunden :)"},
+                },
                 randomTime,
                 -1,
                 [],
