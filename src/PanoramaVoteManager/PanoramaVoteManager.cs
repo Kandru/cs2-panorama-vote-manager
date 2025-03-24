@@ -66,6 +66,7 @@ namespace PanoramaVoteManager
         {
             if (!Config.Enabled) return;
             if (_currentVote != null || _votes.Count == 0) return;
+            if (_timeUntilNextVote > DateTimeOffset.UtcNow.ToUnixTimeSeconds()) return;
             DebugPrint("StartVote");
             // set current vote
             _currentVote = _votes[0];

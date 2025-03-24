@@ -12,10 +12,10 @@ namespace PanoramaVoteManager
         {
             if (!player.UserId.HasValue) return;
             // notify user if vote a vote is already in queue
-            if (_currentVote != null || _votes.Count > 0)
+            if (_currentVote != null || _votes.Count > 0 || _timeUntilNextVote > DateTimeOffset.UtcNow.ToUnixTimeSeconds())
             {
                 // calculate approximate time of all votes in queue
-                long time = _votes.Sum(v => v.Time + Config.Cooldown) + (_currentVote?.Time + (_currentVote?.Time > 0 ? Config.Cooldown : 0) ?? 0);
+                long time = _votes.Sum(v => v.Time + Config.Cooldown) + (_currentVote?.Time + Config.Cooldown ?? Config.Cooldown);
                 command.ReplyToCommand(Localizer["vote.cooldown"].Value
                     .Replace("{time}", time.ToString()));
             }

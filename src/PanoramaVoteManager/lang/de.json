@@ -1,5 +1,5 @@
 {
     "core.debugprint": "[PanoramaVoteManager][DEBUG]: {message}",
     "core.config": "[PanoramaVoteManager] Konfiguration geladen",
-    "vote.cooldown": "Du musst {time} Sekunden warten, bevor du erneut abstimmen kannst"
+    "vote.cooldown": "Deine Abstimmung beginnt in etwa {time} Sekunden"
 }
