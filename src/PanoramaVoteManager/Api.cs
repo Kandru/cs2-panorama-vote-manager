@@ -10,12 +10,13 @@ namespace PanoramaVoteManager
         // adds a vote to the queue. Returns the time in seconds until the vote will be executed
         public int AddVote(Vote vote)
         {
+            int delay = _votes.Sum(v => v.Time + Config.Cooldown) + (_currentVote?.Time + Config.Cooldown ?? Config.Cooldown);
             // add vote to queue
             _votes.Add(vote);
             // check if vote needs to be added to queue
             if (_currentVote != null || _votes.Count > 1 || _timeUntilNextVote > DateTimeOffset.UtcNow.ToUnixTimeSeconds())
             {
-                return _votes.Sum(v => v.Time + Config.Cooldown) + (_currentVote?.Time + Config.Cooldown ?? Config.Cooldown);
+                return delay;
             }
             else
             {
