@@ -1,5 +1,3 @@
-using CounterStrikeSharp.API.Core;
-
 namespace PanoramaVoteManager
 {
     public partial class PanoramaVoteManager
