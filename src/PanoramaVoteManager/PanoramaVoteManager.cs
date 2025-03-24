@@ -119,6 +119,7 @@ namespace PanoramaVoteManager
             // initiate vote controller
             _voteController.PotentialVotes = vote.PlayerIDs.Count;
             _voteController.ActiveIssueIndex = (int)VoteTypes.UNKNOWN;
+            _voteController.IsYesNoVote = true;
         }
 
         private void ResetVoteController()

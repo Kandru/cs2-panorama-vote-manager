@@ -16,6 +16,9 @@ The Panorama Vote Manager allows plugins to interact with the CS2 Panorama Vote 
 
 Updating is even easier: simply overwrite all plugin files and they will be reloaded automatically. To automate updates please use our [CS2 Update Manager](https://github.com/Kandru/cs2-update-manager/).
 
+## Using custom vote text
+
+To be able to use custom vote text your clients (and your server) need the *platform_english.txt* inside the *csgo/resource* folder. An example is provided via this repository. Otherwise the vote will **NOT** show up when using custom text. You can still use the default vote strings inside your plugins, though. Easiest way is to distribute this via a WorkShop AddOn.
 
 ## Configuration
 

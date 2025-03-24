@@ -1,0 +1,9 @@
+"lang"
+{
+    "Language" "English" 
+    "Tokens"
+    {
+        "SFUI_vote_custom_default"           "{s:s1}"
+        "SFUI_vote_custom_image"             "<img src='{s:s1}'>"
+    }
+}
