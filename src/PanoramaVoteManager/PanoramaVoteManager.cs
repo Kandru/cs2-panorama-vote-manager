@@ -227,8 +227,8 @@ namespace PanoramaVoteManager
             DebugPrint("SendMessageVoteUpdate");
             var @event = new EventVoteChanged(true)
             {
-                VoteOption1 = vote.GetYesVotes(),
-                VoteOption2 = vote.GetNoVotes(),
+                Novotes = vote.GetYesVotes(),
+                Yesvotes = vote.GetNoVotes(),
                 Potentialvotes = vote.PlayerIDs.Count,
             };
             @event.FireEvent(false);
