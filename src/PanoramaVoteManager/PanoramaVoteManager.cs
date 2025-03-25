@@ -17,7 +17,7 @@ namespace PanoramaVoteManager
         public override string ModuleAuthor => "Kalle <kalle@kandru.de>";
 
         private readonly PlayerLanguageManager playerLanguageManager = new();
-        private CVoteController? _voteController => Utilities.FindAllEntitiesByDesignerName<CVoteController>("vote_controller").LastOrDefault();
+        private CVoteController? _voteController;
         private List<Vote> _votes = [];
         private Vote? _currentVote = null;
         private long _timeUntilNextVote = 0;
@@ -80,6 +80,9 @@ namespace PanoramaVoteManager
             if (!Config.Enabled) return;
             if (_currentVote != null || _votes.Count == 0) return;
             if (_timeUntilNextVote > DateTimeOffset.UtcNow.ToUnixTimeSeconds()) return;
+            _voteController = Utilities.FindAllEntitiesByDesignerName<CVoteController>("vote_controller").Last();
+            if (_voteController == null
+                || !_voteController.IsValid) return;
             DebugPrint("StartVote");
             // set current vote
             _currentVote = _votes[0];
@@ -182,7 +185,7 @@ namespace PanoramaVoteManager
                 UserMessage userMessage = UserMessage.FromPartialName("VoteStart");
                 userMessage.SetInt("team", vote.Team);
                 userMessage.SetInt("player_slot", vote.Initiator);
-                userMessage.SetInt("vote_type", (int)VoteTypes.UNKNOWN);
+                userMessage.SetInt("vote_type", (int)VoteTypes.RESET);
                 userMessage.SetString("disp_str", vote.SFUI);
                 userMessage.SetString("details_str", text);
                 userMessage.SetString("other_team_str", "#SFUI_otherteam_vote_unimplemented");
@@ -214,7 +217,7 @@ namespace PanoramaVoteManager
             {
                 UserMessage userMessage = UserMessage.FromPartialName("VotePass");
                 userMessage.SetInt("team", vote.Team);
-                userMessage.SetInt("vote_type", (int)VoteTypes.UNKNOWN);
+                userMessage.SetInt("vote_type", (int)VoteTypes.KICK);
                 userMessage.SetString("disp_str", "#SFUI_vote_passed");
                 userMessage.SetString("details_str", "");
                 userMessage.Send(recipientFilter);
