@@ -27,7 +27,7 @@ namespace PanoramaVoteManager
             int voteId = random.NextDouble() < 0.5 ? 99 : player.UserId.Value;
             // add vote
             _votes.Add(new Vote(
-                "#SFUI_vote_custom_default",
+                "#SFUI_vote_passed_changelevel",
                 new Dictionary<string, string> {
                     {"en", $"This is my cool vote -> {randomTime}"},
                     {"de", $"Mein toller Vote -> {randomTime}"},
