@@ -50,15 +50,21 @@ namespace PanoramaVoteManager
             CCSPlayerController? player = @event.Userid;
             if (player == null
                 || !player.IsValid
-                || player.UserId == null) return HookResult.Continue;
-            if (_currentVote == null) return HookResult.Continue;
+                || player.UserId == null
+                || _voteController == null
+                || !_voteController.IsValid
+                || _currentVote == null) return HookResult.Continue;
             DebugPrint("OnVoteCast");
             // check which option got voted for
             VoteOptions votedOption = (VoteOptions)@event.VoteOption;
             if (votedOption == VoteOptions.YES)
+            {
                 _currentVote.OnVoteYes(player.UserId.Value);
+            }
             else if (votedOption == VoteOptions.NO)
+            {
                 _currentVote.OnVoteNo(player.UserId.Value);
+            }
             // send update to panorama
             SendMessageVoteUpdate(_currentVote);
             // end the vote if all players have voted
@@ -99,7 +105,7 @@ namespace PanoramaVoteManager
             _votes.RemoveAt(0);
             // set default values to vote controller
             _voteController.PotentialVotes = _currentVote.PlayerIDs.Count;
-            _voteController.ActiveIssueIndex = (int)VoteTypes.UNKNOWN;
+            _voteController.ActiveIssueIndex = (int)VoteTypes.KICK;
             _voteController.IsYesNoVote = true;
             // send vote update to panorama
             SendMessageVoteUpdate(_currentVote);
@@ -216,7 +222,6 @@ namespace PanoramaVoteManager
                 userMessage.SetInt("vote_type", (int)VoteTypes.RESET);
                 userMessage.SetString("disp_str", vote.SFUI);
                 userMessage.SetString("details_str", text);
-                userMessage.SetString("other_team_str", "#SFUI_otherteam_vote_unimplemented");
                 userMessage.SetBool("is_yes_no_vote", true);
                 userMessage.Send([player]);
             }
@@ -234,6 +239,7 @@ namespace PanoramaVoteManager
                 if (player == null || !player.IsValid) continue;
                 recipientFilter.Add(player);
             }
+            // send user message to indicate vote result
             if (!success)
             {
                 UserMessage userMessage = UserMessage.FromPartialName("VoteFailed");
@@ -245,7 +251,7 @@ namespace PanoramaVoteManager
             {
                 UserMessage userMessage = UserMessage.FromPartialName("VotePass");
                 userMessage.SetInt("team", vote.Team);
-                userMessage.SetInt("vote_type", (int)VoteTypes.KICK);
+                userMessage.SetInt("vote_type", (int)VoteTypes.UNKNOWN);
                 userMessage.SetString("disp_str", "#SFUI_vote_passed");
                 userMessage.SetString("details_str", "");
                 userMessage.Send(recipientFilter);
@@ -260,8 +266,8 @@ namespace PanoramaVoteManager
             DebugPrint("SendMessageVoteUpdate");
             var @event = new EventVoteChanged(true)
             {
-                Novotes = vote.GetYesVotes(),
-                Yesvotes = vote.GetNoVotes(),
+                Yesvotes = vote.GetYesVotes(),
+                Novotes = vote.GetNoVotes(),
                 Potentialvotes = vote.PlayerIDs.Count,
             };
             @event.FireEvent(false);
