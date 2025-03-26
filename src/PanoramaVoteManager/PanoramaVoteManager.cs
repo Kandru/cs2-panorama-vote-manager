@@ -88,18 +88,22 @@ namespace PanoramaVoteManager
             if (!Config.Enabled) return;
             if (_currentVote != null || _votes.Count == 0) return;
             if (_timeUntilNextVote > DateTimeOffset.UtcNow.ToUnixTimeSeconds()) return;
-            _voteController = Utilities.FindAllEntitiesByDesignerName<CVoteController>("vote_controller").Last();
+            // initiate vote controller
+            InitVoteController();
+            // stop if vote controller is not available
             if (_voteController == null
                 || !_voteController.IsValid) return;
             DebugPrint("StartVote");
             // set current vote
             _currentVote = _votes[0];
             _votes.RemoveAt(0);
-            // initiate vote controller
-            ResetVoteController();
-            InitVoteController(_currentVote);
+            // set default values to vote controller
+            _voteController.PotentialVotes = _currentVote.PlayerIDs.Count;
+            _voteController.ActiveIssueIndex = (int)VoteTypes.UNKNOWN;
+            _voteController.IsYesNoVote = true;
+            // send vote update to panorama
             SendMessageVoteUpdate(_currentVote);
-            // send message
+            // send user message to panorama
             SendMessageVoteStart(_currentVote);
             // add a timer to end the vote after the specified time
             var currentVote = _currentVote;
@@ -151,16 +155,27 @@ namespace PanoramaVoteManager
             });
         }
 
-        private void InitVoteController(Vote vote)
+        private void InitVoteController()
         {
-            if (vote == null
-                || _voteController == null
-                || !_voteController.IsValid) return;
             DebugPrint("InitVoteController");
-            // initiate vote controller
-            _voteController.PotentialVotes = vote.PlayerIDs.Count;
-            _voteController.ActiveIssueIndex = (int)VoteTypes.UNKNOWN;
-            _voteController.IsYesNoVote = true;
+            if (_voteController == null
+                || !_voteController.IsValid)
+            {
+                DebugPrint("VoteController not found - checking for new one");
+                _voteController = Utilities.FindAllEntitiesByDesignerName<CVoteController>("vote_controller").Last();
+                if (_voteController == null
+                    || !_voteController.IsValid)
+                {
+                    DebugPrint("VoteController not available - creating a new one");
+                    _voteController = Utilities.CreateEntityByName<CVoteController>("vote_controller");
+                }
+                if (_voteController == null
+                    || !_voteController.IsValid)
+                {
+                    DebugPrint("VoteController could not be created - aborting");
+                    return;
+                }
+            }
         }
 
         private void ResetVoteController()
