@@ -32,12 +32,14 @@ namespace PanoramaVoteManager
             if (!Config.Enabled) return;
             // register event handlers
             RegisterEventHandler<EventVoteCast>(OnVoteCast);
+            RegisterListener<Listeners.OnMapStart>(OnMapStart);
             RegisterListener<Listeners.OnMapEnd>(OnMapEnd);
         }
 
         public override void Unload(bool hotReload)
         {
             DeregisterEventHandler<EventVoteCast>(OnVoteCast);
+            RemoveListener<Listeners.OnMapStart>(OnMapStart);
             RemoveListener<Listeners.OnMapEnd>(OnMapEnd);
             // end votes (if any)
             EndVote();
@@ -63,6 +65,12 @@ namespace PanoramaVoteManager
             if (_currentVote.GetYesVotes() + _currentVote.GetNoVotes() >= _currentVote.PlayerIDs.Count)
                 EndVote();
             return HookResult.Continue;
+        }
+
+        private void OnMapStart(string mapName)
+        {
+            if (Config.ServerSideVoting)
+                AddTimer(3f, () => EnableServerSideVoting());
         }
 
         private void OnMapEnd()
