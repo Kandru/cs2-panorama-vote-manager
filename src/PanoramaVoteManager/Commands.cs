@@ -11,6 +11,8 @@ namespace PanoramaVoteManager
         [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY, minArgs: 0, usage: "!t")]
         public void CommandTest(CCSPlayerController player, CommandInfo command)
         {
+            if (!Config.Enabled
+                || !Config.Debug) return;
             if (!player.UserId.HasValue) return;
             // notify user if vote a vote is already in queue
             if (_currentVote != null || _votes.Count > 0 || _timeUntilNextVote > DateTimeOffset.UtcNow.ToUnixTimeSeconds())
