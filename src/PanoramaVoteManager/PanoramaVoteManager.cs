@@ -103,6 +103,8 @@ namespace PanoramaVoteManager
             // set current vote
             _currentVote = _votes[0];
             _votes.RemoveAt(0);
+            // set cooldown
+            _timeUntilNextVote = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + _currentVote.Time + Config.Cooldown;
             // set default values to vote controller
             _voteController.PotentialVotes = _currentVote.PlayerIDs.Count;
             _voteController.ActiveIssueIndex = (int)VoteTypes.KICK;
