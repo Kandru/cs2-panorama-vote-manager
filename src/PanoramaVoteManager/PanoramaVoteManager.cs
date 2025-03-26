@@ -117,7 +117,9 @@ namespace PanoramaVoteManager
 
         private void EndVote(bool canceled = false)
         {
-            if (_currentVote == null || _voteController == null) return;
+            if (_currentVote == null
+                || _voteController == null
+                || !_voteController.IsValid) return;
             DebugPrint("EndVote");
             VoteStates result = _currentVote.OnVoteEnd();
             if (!canceled && result == VoteStates.SUCCESS)
@@ -151,7 +153,9 @@ namespace PanoramaVoteManager
 
         private void InitVoteController(Vote vote)
         {
-            if (vote == null || _voteController == null) return;
+            if (vote == null
+                || _voteController == null
+                || !_voteController.IsValid) return;
             DebugPrint("InitVoteController");
             // initiate vote controller
             _voteController.PotentialVotes = vote.PlayerIDs.Count;
@@ -161,7 +165,8 @@ namespace PanoramaVoteManager
 
         private void ResetVoteController()
         {
-            if (_voteController == null) return;
+            if (_voteController == null
+                || !_voteController.IsValid) return;
             DebugPrint("ResetVoteController");
             // reset vote controller
             foreach (var i in Enumerable.Range(0, 5))
@@ -234,7 +239,9 @@ namespace PanoramaVoteManager
 
         private void SendMessageVoteUpdate(Vote vote)
         {
-            if (vote == null || _voteController == null) return;
+            if (vote == null
+                || _voteController == null
+                || !_voteController.IsValid) return;
             DebugPrint("SendMessageVoteUpdate");
             var @event = new EventVoteChanged(true)
             {
