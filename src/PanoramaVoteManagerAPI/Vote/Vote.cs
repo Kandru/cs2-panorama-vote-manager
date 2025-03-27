@@ -14,9 +14,17 @@ public class Vote
     public float MinSuccessPercentage { get; set; } = 0.5f;
     public int MinVotes { get; set; } = 1;
     public Dictionary<int, int> _voters { get; set; } = new Dictionary<int, int>();
+    public VoteFlags Flags { get; set; } = VoteFlags.None;
     public Action<Vote, bool>? Callback { get; set; } = null;
 
-    public Vote(string sfui, Dictionary<string, string> text, int time, int team, List<int> playerIDs, int initiator = 99, Action<Vote, bool>? callback = null)
+    public Vote(string sfui,
+        Dictionary<string, string> text,
+        int time,
+        int team,
+        List<int> playerIDs,
+        int initiator = 99,
+        VoteFlags flags = VoteFlags.None,
+        Action<Vote, bool>? callback = null)
     {
         SFUI = sfui;
         Text = text;
@@ -24,6 +32,7 @@ public class Vote
         Team = team;
         PlayerIDs = playerIDs;
         Initiator = initiator;
+        Flags = flags;
         Callback = callback;
         // update playerIDs
         UpdatePlayerIDs();
@@ -78,15 +87,22 @@ public class Vote
 
     public VoteStates OnVoteEnd()
     {
+        // prepare vote result
         int totalVotes = GetYesVotes() + GetNoVotes();
         float successPercentage = (float)GetYesVotes() / totalVotes;
-
+        // return success if VoteFlags.AlwaysSuccessful is set
+        if ((Flags & VoteFlags.AlwaysSuccessful) == VoteFlags.AlwaysSuccessful)
+            return VoteStates.SUCCESS;
+        // if total votes are less than MinVotes return failed
         if (totalVotes < MinVotes)
             return VoteStates.FAILED;
+        // if success percentage is greater than MinSuccessPercentage return success
         else if (successPercentage >= MinSuccessPercentage && GetYesVotes() > GetNoVotes())
             return VoteStates.SUCCESS;
+        // if yes vote count is less than no vote count return failed
         else if (GetYesVotes() < GetNoVotes())
             return VoteStates.FAILED;
+        // return a draw if none of the above conditions are met
         else
             return VoteStates.DRAW;
     }
