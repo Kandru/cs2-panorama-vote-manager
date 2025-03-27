@@ -266,13 +266,14 @@ namespace PanoramaVoteManager
                 || _voteController == null
                 || !_voteController.IsValid) return;
             DebugPrint("SendMessageVoteUpdate");
-            var @event = new EventVoteChanged(true)
-            {
-                Yesvotes = vote.GetYesVotes(),
-                Novotes = vote.GetNoVotes(),
-                Potentialvotes = vote.PlayerIDs.Count,
-            };
-            @event.FireEvent(false);
+            var @event = NativeAPI.CreateEvent("vote_changed", true);
+            NativeAPI.SetEventInt(@event, "vote_option1", vote.GetYesVotes());
+            NativeAPI.SetEventInt(@event, "vote_option2", vote.GetNoVotes());
+            NativeAPI.SetEventInt(@event, "vote_option3", 0);
+            NativeAPI.SetEventInt(@event, "vote_option4", 0);
+            NativeAPI.SetEventInt(@event, "vote_option5", 0);
+            NativeAPI.SetEventInt(@event, "potentialVotes", vote.PlayerIDs.Count);
+            NativeAPI.FireEvent(@event, false);
         }
     }
 }
