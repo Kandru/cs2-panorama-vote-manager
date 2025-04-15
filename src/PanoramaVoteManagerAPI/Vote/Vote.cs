@@ -91,7 +91,7 @@ public class Vote
         int totalVotes = GetYesVotes() + GetNoVotes();
         float successPercentage = (float)GetYesVotes() / totalVotes;
         // return success if VoteFlags.AlwaysSuccessful is set
-        if ((Flags & VoteFlags.AlwaysSuccessful) == VoteFlags.AlwaysSuccessful)
+        if (Flags.HasFlag(VoteFlags.AlwaysSuccessful))
             return VoteStates.SUCCESS;
         // if total votes are less than MinVotes return failed
         if (totalVotes < MinVotes)

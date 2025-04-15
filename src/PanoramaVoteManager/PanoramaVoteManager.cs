@@ -68,7 +68,10 @@ namespace PanoramaVoteManager
             // send update to panorama
             SendMessageVoteUpdate(_currentVote);
             // end the vote if all players have voted
-            if (_currentVote.GetYesVotes() + _currentVote.GetNoVotes() >= _currentVote.PlayerIDs.Count)
+            if (_currentVote.GetYesVotes() + _currentVote.GetNoVotes() >= _currentVote.PlayerIDs.Count
+                // or if no votes can't overtake yes votes anymore or draw is possible
+                || (_currentVote.GetYesVotes() >= (_currentVote.PlayerIDs.Count - _currentVote.GetYesVotes())
+                    && !_currentVote.Flags.HasFlag(VoteFlags.DoNotEndUntilAllVoted)))
                 EndVote();
             return HookResult.Continue;
         }
