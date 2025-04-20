@@ -89,7 +89,7 @@ public class Vote
     {
         // prepare vote result
         int totalVotes = GetYesVotes() + GetNoVotes();
-        float successPercentage = (float)GetYesVotes() / totalVotes;
+        float successPercentage = (float)GetYesVotes() / PlayerIDs.Count;
         // return success if VoteFlags.AlwaysSuccessful is set
         if (Flags.HasFlag(VoteFlags.AlwaysSuccessful))
             return VoteStates.SUCCESS;
