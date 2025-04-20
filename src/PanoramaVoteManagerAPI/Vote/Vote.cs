@@ -11,7 +11,7 @@ public class Vote
     public int Team { get; set; }
     public List<int> PlayerIDs { get; set; }
     public int Initiator { get; set; }
-    public float MinSuccessPercentage { get; set; } = 0.5f;
+    public float MinSuccessPercentage { get; set; } = 0.6f;
     public int MinVotes { get; set; } = 1;
     public Dictionary<int, int> _voters { get; set; } = new Dictionary<int, int>();
     public VoteFlags Flags { get; set; } = VoteFlags.None;
