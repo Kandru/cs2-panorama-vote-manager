@@ -23,6 +23,8 @@ public class Vote
         int team,
         List<int> playerIDs,
         int initiator = 99,
+        float minSuccessPercentage = 0.51f,
+        int minVotes = 1,
         VoteFlags flags = VoteFlags.None,
         Action<Vote, bool>? callback = null)
     {
@@ -32,6 +34,8 @@ public class Vote
         Team = team;
         PlayerIDs = playerIDs;
         Initiator = initiator;
+        MinSuccessPercentage = minSuccessPercentage;
+        MinVotes = minVotes;
         Flags = flags;
         Callback = callback;
         // update playerIDs
