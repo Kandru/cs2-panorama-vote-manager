@@ -64,9 +64,11 @@ public class Vote
             // get playerids which are disconnected
             var missingPlayers = PlayerIDs.Except(players.Select(p => p.UserId!.Value));
             foreach (var missingPlayer in missingPlayers)
+            {
+                // remove missing players from _voters list
                 _voters.Remove(missingPlayer);
-            // update PlayerIDs list
-            PlayerIDs = [.. players.Where(p => p.UserId.HasValue).Select(p => p.UserId!.Value)];
+                PlayerIDs.Remove(missingPlayer);
+            }
         }
         else
         {
