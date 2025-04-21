@@ -4,6 +4,7 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Core.Capabilities;
 using CounterStrikeSharp.API.Modules.Commands;
+using PanoramaVoteManagerAPI.Enums;
 
 namespace ExampleEventListenerPlugin
 {
@@ -11,7 +12,7 @@ namespace ExampleEventListenerPlugin
     {
         public override string ModuleName => "ExampleEventListenerPlugin";
         public override string ModuleAuthor => "Kalle <kalle@kandru.de>";
-        public override string ModuleVersion => "1.0.0";
+        public override string ModuleVersion => "1.0.1";
 
         private static PluginCapability<IPanoramaVoteManagerAPI> VoteAPI { get; } = new("panoramavotemanager:api");
         private IPanoramaVoteManagerAPI? _voteManager;
@@ -45,16 +46,19 @@ namespace ExampleEventListenerPlugin
             // randomize vote initiator
             int voteId = random.NextDouble() < 0.5 ? 99 : player.UserId.Value;
             Vote vote = new Vote(
-                "#SFUI_vote_custom_default",
-                new Dictionary<string, string> {
+                sfui: "#SFUI_vote_custom_default",
+                text: new Dictionary<string, string> {
                     {"en", $"This is vote triggered by another plugin for {randomTime} seconds :)"},
                     {"de", $"Das ist ein Vote aus einem anderen Plugin für {randomTime} Sekunden :)"},
                 },
-                randomTime,
-                -1,
-                [],
-                voteId,
-                OnVoteResult
+                time: randomTime,
+                team: -1,
+                playerIDs: [],
+                initiator: voteId,
+                minSuccessPercentage: 0.51f,
+                minVotes: 1,
+                flags: VoteFlags.None,
+                callback: OnVoteResult
             );
             if (_voteManager != null)
             {
@@ -71,7 +75,7 @@ namespace ExampleEventListenerPlugin
         public void OnVoteResult(Vote vote, bool success)
         {
             Console.WriteLine("==== OnVoteResult called! ====");
-            Console.WriteLine($"Vote: {vote.Title} was {(success ? "successful" : "unsuccessful")}");
+            Console.WriteLine($"Vote was {(success ? "successful" : "unsuccessful")}");
         }
     }
 }
