@@ -50,10 +50,11 @@ namespace PanoramaVoteManager
             CCSPlayerController? player = @event.Userid;
             if (player == null
                 || !player.IsValid
-                || player.UserId == null
+                || !player.UserId.HasValue
                 || _voteController == null
                 || !_voteController.IsValid
-                || _currentVote == null) return HookResult.Continue;
+                || _currentVote == null
+                || !_currentVote.PlayerIDs.Contains(player.UserId.Value)) return HookResult.Continue;
             DebugPrint("OnVoteCast");
             // check which option got voted for
             VoteOptions votedOption = (VoteOptions)@event.VoteOption;
@@ -217,6 +218,8 @@ namespace PanoramaVoteManager
             {
                 CCSPlayerController? player = Utilities.GetPlayerFromUserid(playerID);
                 if (player == null || !player.IsValid) continue;
+                RecipientFilter recipientFilter = [];
+                recipientFilter.Add(player);
                 // get translation for player (if available), otherwise use server language, otherwise use first entry
                 string text = vote.Text.TryGetValue(playerLanguageManager.GetLanguage(new SteamID(player.NetworkIDString)).TwoLetterISOLanguageName, out string? playerLanguage) ? playerLanguage
                     : vote.Text.TryGetValue(CoreConfig.ServerLanguage, out string? serverLanguage) ? serverLanguage
@@ -228,7 +231,7 @@ namespace PanoramaVoteManager
                 userMessage.SetString("disp_str", vote.SFUI);
                 userMessage.SetString("details_str", text);
                 userMessage.SetBool("is_yes_no_vote", true);
-                userMessage.Send([player]);
+                userMessage.Send(recipientFilter);
             }
         }
 
