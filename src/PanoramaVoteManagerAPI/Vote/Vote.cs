@@ -91,10 +91,15 @@ public class Vote
     {
         // prepare vote result
         int totalVotes = GetYesVotes() + GetNoVotes();
-        float successPercentage = (float)GetYesVotes() / PlayerIDs.Count;
+        float successPercentage = PlayerIDs.Count > 0
+            ? (float)GetYesVotes() / PlayerIDs.Count
+            : 0;
         // return success if VoteFlags.AlwaysSuccessful is set
         if (Flags.HasFlag(VoteFlags.AlwaysSuccessful))
             return VoteStates.SUCCESS;
+        // if no players are eligible to vote, consider it failed
+        if (PlayerIDs.Count == 0)
+            return VoteStates.FAILED;
         // if total votes are less than MinVotes return failed
         if (totalVotes < MinVotes)
             return VoteStates.FAILED;
