@@ -91,6 +91,15 @@ public class Vote
         return _voters.Count(v => v.Value == (int)VoteOptions.NO);
     }
 
+    public bool CheckIfVoteShouldEnd()
+    {
+        int remainingVotes = PlayerIDs.Count - (GetYesVotes() + GetNoVotes());
+        return GetYesVotes() + GetNoVotes() >= PlayerIDs.Count
+                // or if no votes can't overtake yes votes anymore
+                || (GetYesVotes() > GetNoVotes() + remainingVotes
+                    && !Flags.HasFlag(VoteFlags.DoNotEndUntilAllVoted));
+    }
+
     public VoteStates OnVoteEnd()
     {
         // prepare vote result
