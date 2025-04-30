@@ -19,17 +19,22 @@ namespace PanoramaVoteManager
         private readonly PlayerLanguageManager playerLanguageManager = new();
         private CVoteController? _voteController;
         private List<Vote> _votes = [];
-        private Vote? _currentVote = null;
-        private long _timeUntilNextVote = 0;
+        private Vote? _currentVote;
+        private long _timeUntilNextVote;
 
         public override void Load(bool hotReload)
         {
             API = this;
             // register plugin capability
             if (!hotReload)
-                Capabilities.RegisterPluginCapability(IPanoramaVoteManagerAPI.Capability, () => API);
+            {
+                Capabilities.RegisterPluginCapability(IPanoramaVoteManagerAPI.Capability, static () => API);
+            }
             // do not load if plugin is disabled
-            if (!Config.Enabled) return;
+            if (!Config.Enabled)
+            {
+                return;
+            }
             // register event handlers
             RegisterEventHandler<EventVoteCast>(OnVoteCast);
             RegisterListener<Listeners.OnMapStart>(OnMapStart);
@@ -54,7 +59,11 @@ namespace PanoramaVoteManager
                 || _voteController == null
                 || !_voteController.IsValid
                 || _currentVote == null
-                || !_currentVote.PlayerIDs.Contains(player.UserId.Value)) return HookResult.Continue;
+                || !_currentVote.PlayerIDs.Contains(player.UserId.Value))
+            {
+                return HookResult.Continue;
+            }
+
             DebugPrint("OnVoteCast");
             // check which option got voted for
             VoteOptions votedOption = (VoteOptions)@event.VoteOption;
@@ -70,19 +79,28 @@ namespace PanoramaVoteManager
             SendMessageVoteUpdate(_currentVote);
             // end the vote if all players have voted
             if (_currentVote.CheckIfVoteShouldEnd())
+            {
                 EndVote();
+            }
+
             return HookResult.Continue;
         }
 
         private void OnMapStart(string mapName)
         {
             if (Config.ServerSideVoting)
-                AddTimer(3f, () => EnableServerSideVoting());
+            {
+                _ = AddTimer(3f, EnableServerSideVoting);
+            }
         }
 
         private void OnMapEnd()
         {
-            if (!Config.Enabled) return;
+            if (!Config.Enabled)
+            {
+                return;
+            }
+
             DebugPrint("OnMapEnd");
             // end votes (if any)
             EndVote();
@@ -92,14 +110,29 @@ namespace PanoramaVoteManager
 
         private void StartVote()
         {
-            if (!Config.Enabled) return;
-            if (_currentVote != null || _votes.Count == 0) return;
-            if (_timeUntilNextVote > DateTimeOffset.UtcNow.ToUnixTimeSeconds()) return;
+            if (!Config.Enabled)
+            {
+                return;
+            }
+
+            if (_currentVote != null || _votes.Count == 0)
+            {
+                return;
+            }
+
+            if (_timeUntilNextVote > DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            {
+                return;
+            }
             // initiate vote controller
             InitVoteController();
             // stop if vote controller is not available
             if (_voteController == null
-                || !_voteController.IsValid) return;
+                || !_voteController.IsValid)
+            {
+                return;
+            }
+
             DebugPrint("StartVote");
             // set current vote
             _currentVote = _votes[0];
@@ -115,8 +148,8 @@ namespace PanoramaVoteManager
             // send user message to panorama
             SendMessageVoteStart(_currentVote);
             // add a timer to end the vote after the specified time
-            var currentVote = _currentVote;
-            AddTimer(_currentVote.Time, () =>
+            Vote currentVote = _currentVote;
+            _ = AddTimer(_currentVote.Time, () =>
             {
                 if (_currentVote == null || _currentVote != currentVote)
                 {
@@ -132,7 +165,11 @@ namespace PanoramaVoteManager
         {
             if (_currentVote == null
                 || _voteController == null
-                || !_voteController.IsValid) return;
+                || !_voteController.IsValid)
+            {
+                return;
+            }
+
             DebugPrint("EndVote");
             VoteStates result = _currentVote.OnVoteEnd();
             if (!canceled && result == VoteStates.SUCCESS)
@@ -140,16 +177,14 @@ namespace PanoramaVoteManager
                 // send user message to players
                 SendMessageVoteEnd(_currentVote, true);
                 // send vote result to external plugin
-                if (_currentVote.Callback != null)
-                    _currentVote.Callback(_currentVote, true);
+                _currentVote.Callback?.Invoke(_currentVote, true);
             }
             else
             {
                 // send user message to players
                 SendMessageVoteEnd(_currentVote, false);
                 // send vote result to external plugin
-                if (_currentVote.Callback != null)
-                    _currentVote.Callback(_currentVote, false);
+                _currentVote.Callback?.Invoke(_currentVote, false);
             }
             // reset vote controller
             ResetVoteController();
@@ -157,7 +192,7 @@ namespace PanoramaVoteManager
             _currentVote = null;
             // set cooldown
             _timeUntilNextVote = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + Config.Cooldown;
-            AddTimer(Config.Cooldown, () =>
+            _ = AddTimer(Config.Cooldown, () =>
             {
                 DebugPrint($"Cooldown ended, starting next vote in {Config.Cooldown} seconds");
                 StartVote();
@@ -190,31 +225,50 @@ namespace PanoramaVoteManager
         private void ResetVoteController()
         {
             if (_voteController == null
-                || !_voteController.IsValid) return;
+                || !_voteController.IsValid)
+            {
+                return;
+            }
+
             DebugPrint("ResetVoteController");
             // reset vote controller
-            foreach (var i in Enumerable.Range(0, 5))
+            foreach (int i in Enumerable.Range(0, 5))
+            {
                 _voteController.VoteOptionCount[i] = 0;
+            }
+
             for (int i = 0; i < Server.MaxPlayers; i++)
+            {
                 _voteController.VotesCast[i] = (int)VoteOptions.REMOVE;
+            }
         }
 
         private void SendMessageVoteStart(Vote vote)
         {
-            if (vote == null) return;
+            if (vote == null)
+            {
+                return;
+            }
+
             DebugPrint("SendMessageVoteStart");
             // get player slot of userid for initiator
             if (vote.Initiator != 99)
             {
                 CCSPlayerController? player = Utilities.GetPlayerFromUserid(vote.Initiator);
                 if (player != null && player.IsValid)
+                {
                     vote.Initiator = player.Slot;
+                }
             }
             // send message to each recipient to allow individual translation
-            foreach (var playerID in vote.PlayerIDs)
+            foreach (int playerID in vote.PlayerIDs)
             {
                 CCSPlayerController? player = Utilities.GetPlayerFromUserid(playerID);
-                if (player == null || !player.IsValid) continue;
+                if (player == null || !player.IsValid)
+                {
+                    continue;
+                }
+
                 RecipientFilter recipientFilter = [];
                 recipientFilter.Add(player);
                 // get translation for player (if available), otherwise use server language, otherwise use first entry
@@ -234,14 +288,22 @@ namespace PanoramaVoteManager
 
         private void SendMessageVoteEnd(Vote vote, bool success)
         {
-            if (vote == null) return;
+            if (vote == null)
+            {
+                return;
+            }
+
             DebugPrint("SendMessageVoteEnd");
             // set recipients which should get the message (if applicable)
             RecipientFilter recipientFilter = [];
-            foreach (var playerID in vote.PlayerIDs)
+            foreach (int playerID in vote.PlayerIDs)
             {
                 CCSPlayerController? player = Utilities.GetPlayerFromUserid(playerID);
-                if (player == null || !player.IsValid) continue;
+                if (player == null || !player.IsValid)
+                {
+                    continue;
+                }
+
                 recipientFilter.Add(player);
             }
             // send user message to indicate vote result
@@ -267,9 +329,13 @@ namespace PanoramaVoteManager
         {
             if (vote == null
                 || _voteController == null
-                || !_voteController.IsValid) return;
+                || !_voteController.IsValid)
+            {
+                return;
+            }
+
             DebugPrint("SendMessageVoteUpdate");
-            var @event = NativeAPI.CreateEvent("vote_changed", true);
+            nint @event = NativeAPI.CreateEvent("vote_changed", true);
             NativeAPI.SetEventInt(@event, "vote_option1", vote.GetYesVotes());
             NativeAPI.SetEventInt(@event, "vote_option2", vote.GetNoVotes());
             NativeAPI.SetEventInt(@event, "vote_option3", 0);

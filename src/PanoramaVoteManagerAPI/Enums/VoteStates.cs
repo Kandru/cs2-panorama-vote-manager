@@ -1,8 +1,9 @@
-namespace PanoramaVoteManagerAPI.Enums;
-
-public enum VoteStates
+namespace PanoramaVoteManagerAPI.Enums
 {
-    FAILED,
-    DRAW,
-    SUCCESS
+    public enum VoteStates
+    {
+        FAILED,
+        DRAW,
+        SUCCESS
+    }
 }

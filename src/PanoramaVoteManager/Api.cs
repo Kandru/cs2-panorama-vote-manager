@@ -32,7 +32,7 @@ namespace PanoramaVoteManager
             if (_votes.Contains(vote))
             {
                 // if in queue simply remove
-                _votes.Remove(vote);
+                _ = _votes.Remove(vote);
                 return true;
             }
             else if (_currentVote == vote)

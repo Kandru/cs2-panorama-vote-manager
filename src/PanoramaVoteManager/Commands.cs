@@ -12,8 +12,15 @@ namespace PanoramaVoteManager
         public void CommandTest(CCSPlayerController player, CommandInfo command)
         {
             if (!Config.Enabled
-                || !Config.Debug) return;
-            if (!player.UserId.HasValue) return;
+                || !Config.Debug)
+            {
+                return;
+            }
+
+            if (!player.UserId.HasValue)
+            {
+                return;
+            }
             // notify user if vote a vote is already in queue
             if (_currentVote != null || _votes.Count > 0 || _timeUntilNextVote > DateTimeOffset.UtcNow.ToUnixTimeSeconds())
             {
@@ -22,7 +29,7 @@ namespace PanoramaVoteManager
                 command.ReplyToCommand(Localizer["vote.cooldown"].Value
                     .Replace("{time}", time.ToString()));
             }
-            Random random = new Random();
+            Random random = new();
             // Generates a random number between 3 and 12 inclusive
             int randomTime = random.Next(3, 13);
             // randomize vote initiator

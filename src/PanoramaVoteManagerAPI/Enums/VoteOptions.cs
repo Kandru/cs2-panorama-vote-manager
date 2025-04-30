@@ -1,12 +1,13 @@
-namespace PanoramaVoteManagerAPI.Enums;
-
-public enum VoteOptions
+namespace PanoramaVoteManagerAPI.Enums
 {
-    UNKNOWN = -1,
-    YES,
-    NO,
-    OPTION_3,
-    OPTION_4,
-    OPTION_5,
-    REMOVE
+    public enum VoteOptions
+    {
+        UNKNOWN = -1,
+        YES,
+        NO,
+        OPTION3,
+        OPTION4,
+        OPTION5,
+        REMOVE
+    }
 }

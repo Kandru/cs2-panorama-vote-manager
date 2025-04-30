@@ -18,7 +18,11 @@ namespace PanoramaVoteManager
             Server.ExecuteCommand("sv_vote_allow_in_warmup true");
             Server.ExecuteCommand("sv_vote_allow_spectators true");
             Server.ExecuteCommand("sv_vote_count_spectator_votes true");
-            if (!Config.ServerDisableVoteOptions) return;
+            if (!Config.ServerDisableVoteOptions)
+            {
+                return;
+            }
+
             Server.ExecuteCommand("sv_vote_issue_changelevel_allowed false");
             Server.ExecuteCommand("sv_vote_issue_kick_allowed false");
             Server.ExecuteCommand("sv_vote_issue_loadbackup_allowed false");

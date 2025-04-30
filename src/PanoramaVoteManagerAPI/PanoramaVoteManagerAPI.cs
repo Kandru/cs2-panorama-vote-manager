@@ -1,11 +1,12 @@
 ﻿using CounterStrikeSharp.API.Core.Capabilities;
 
-namespace PanoramaVoteManagerAPI;
-
-public interface IPanoramaVoteManagerAPI
+namespace PanoramaVoteManagerAPI
 {
-    public static readonly PluginCapability<IPanoramaVoteManagerAPI> Capability = new("panoramavotemanager:api");
+    public interface IPanoramaVoteManagerAPI
+    {
+        static readonly PluginCapability<IPanoramaVoteManagerAPI> Capability = new("panoramavotemanager:api");
 
-    public int AddVote(Vote.Vote vote);
-    public bool RemoveVote(Vote.Vote vote);
+        int AddVote(Vote.Vote vote);
+        bool RemoveVote(Vote.Vote vote);
+    }
 }
