@@ -66,10 +66,10 @@ namespace PanoramaVoteManagerAPI.Vote
             if (PlayerIDs.Count > 0)
             {
                 // get playerids which are disconnected
-                IEnumerable<int> missingPlayers = PlayerIDs.Except(players.Select(static p => p.UserId!.Value));
+                List<int> missingPlayers = PlayerIDs.Except(players.Select(static p => p.UserId!.Value)).ToList();
                 foreach (int missingPlayer in missingPlayers)
                 {
-                    // remove missing players from _voters list
+                    // remove missing players from lists
                     _ = Voters.Remove(missingPlayer);
                     _ = PlayerIDs.Remove(missingPlayer);
                 }
