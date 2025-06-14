@@ -11,8 +11,8 @@ The Panorama Vote Manager allows plugins to interact with the CS2 Panorama Vote 
 
 1. Download and extract the latest release from the [GitHub releases page](https://github.com/Kandru/cs2-panorama-vote-manager/releases/).
 2. Stop the server.
-2. Move the "PanoramaVoteManager" folder to the `/addons/counterstrikesharp/configs/plugins/` directory.
-2. Move the "PanoramaVoteManagerAPI" folder to the `/addons/counterstrikesharp/configs/shared/` directory.
+2. Move the "PanoramaVoteManager" folder to the `/addons/counterstrikesharp/plugins/` directory.
+2. Move the "PanoramaVoteManagerAPI" folder to the `/addons/counterstrikesharp/shared/` directory.
 3. Restart the server.
 
 ## Using custom vote text
