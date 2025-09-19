@@ -62,9 +62,15 @@ Whether or not all native cs2 votings should be disabled (only effective if serv
 
 ## Commands
 
-### !test
+### (server-console only) panoramavotemanager <command>
 
-Debug command to initiate a test vote. Will be removed in future.
+#### reload
+
+Reloads the configuration.
+
+#### test
+
+Tests the panorama vote manager functionality. Will spawn a new vote.
 
 ## Compile Yourself
 
